@@ -1,3 +1,7 @@
+> [!WARNING]
+> # SOW IS BROKEN! I WILL TRY TO FIX ASAP
+> DO **NOT** SEND PRs OR ISSUES!
+
 ## FOR SOW PACKAGE MANAGER 
 
 This is for the Sow Package Manager.
