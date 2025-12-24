@@ -25,6 +25,7 @@ class Environment:
         def top(text):
             (width, _) = os.get_terminal_size()
             pad = max(0, width - len(text))
+            print(system.Output.Format.RESET, end="")
             print("\033[7m" + " " * (pad // 2) + text + " " * (pad - pad // 2) + "\033[0m")
 
         def bottom(text):
@@ -74,6 +75,30 @@ class Environment:
 
             bottom(status_msg or "Ctrl+S Save | Ctrl+O Reload | Esc Exit")
 
+        def get_line_col(pos):
+            """Get the line number and column position for a given cursor position"""
+            text = ''.join(content[:pos])
+            lines = text.split('\n')
+            line = len(lines) - 1
+            col = len(lines[-1])
+            return line, col
+
+        def get_pos_from_line_col(line, col):
+            """Get cursor position from line and column"""
+            text = ''.join(content)
+            lines = text.split('\n')
+            
+            # Clamp line to valid range
+            line = max(0, min(line, len(lines) - 1))
+            
+            # Calculate position up to the start of the target line
+            pos = sum(len(lines[i]) + 1 for i in range(line))
+            
+            # Add column offset, clamped to line length
+            pos += min(col, len(lines[line]))
+            
+            return pos
+
         def on_key_press(event):
             nonlocal cursor_pos, status_msg, content, filename
 
@@ -102,25 +127,15 @@ class Environment:
             elif event.name == 'right' and cursor_pos < len(content):
                 cursor_pos += 1
             elif event.name == 'up':
-                text = ''.join(content[:cursor_pos])
-                if '\n' in text:
-                    lines = text.split('\n')
-                    current_line_pos = len(lines[-1])
-                    if len(lines) > 1:
-                        prev_line_len = len(lines[-2])
-                        cursor_pos -= current_line_pos + 1 + (prev_line_len - min(current_line_pos, prev_line_len))
+                line, col = get_line_col(cursor_pos)
+                if line > 0:
+                    cursor_pos = get_pos_from_line_col(line - 1, col)
             elif event.name == 'down':
-                text = ''.join(content[cursor_pos:])
-                if '\n' in text:
-                    next_newline = text.index('\n')
-                    text_before = ''.join(content[:cursor_pos])
-                    current_line_pos = len(text_before.split('\n')[-1])
-                    remaining = text[next_newline + 1:]
-                    if '\n' in remaining:
-                        next_line_len = remaining.index('\n')
-                    else:
-                        next_line_len = len(remaining)
-                    cursor_pos += next_newline + 1 + min(current_line_pos, next_line_len)
+                line, col = get_line_col(cursor_pos)
+                text = ''.join(content)
+                max_line = len(text.split('\n')) - 1
+                if line < max_line:
+                    cursor_pos = get_pos_from_line_col(line + 1, col)
             elif event.name == 'backspace' and cursor_pos > 0:
                 content.pop(cursor_pos - 1)
                 cursor_pos -= 1
@@ -156,6 +171,7 @@ class Environment:
             finally:
                 keyboard.unhook_all()
                 print("\033[?25h")
+                print(system.Output.Format.LIB_RESET)
                 clear()
 
         main()

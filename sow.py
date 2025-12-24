@@ -13,30 +13,12 @@ def link(link):
     if resp.status_code != 200:
         print("Could not obtain via scraping.\nStatus Code:", resp.status_code)
         raise ConnectionError
-    return resp.text
+    else:
+        if not link in ["https://raw.githubusercontent.com/SoftPankek7/SowPackageManager/refs/heads/main/LICENSE"]:
+            system.Output.info("Got data from "+str(link))
+    return resp.text.replace('\r\n', '\n').replace('\r', '\n')
 
 class PackageManaging:
-    def install(name):
-        try:
-            print("Downloading raw content of "+name+".py")
-            item = link("https://raw.githubusercontent.com/SoftPankek7/SowPackageManager/refs/heads/main/"+str(name)+".py")
-            print("Got Content.")
-            print("Trying to clear "+name+".py")
-            with open(name+".py", 'w') as file:
-                pass
-            print("Installing "+str(name))
-            with open(name+".py", "wt") as file:
-                file.write(item)
-            print("Installed "+name+".py")
-            print(f"Linking {str(name)} to libs.el")
-            with open(name, "at") as file:
-                file.write(item)
-            print("Finished Linking.")
-            print("Done! Restart env to see effects.")
-            return True
-        except ConnectionError:
-            return False
-        
     def download(name):
         try:
             print("Downloading raw content of "+name)
@@ -44,9 +26,28 @@ class PackageManaging:
             print("Got Content.")
             print("Installing "+str(name))
             with open(name, "wt") as file:
-                file.write(item)
+                file.write(item) # file.write
             print("Downloaded "+str(name))
             print("Done! Downloaded to path.")
+            return True
+        except ConnectionError:
+            return False
+    def install(name):
+        try:
+            print("Downloading raw content of "+name+".py")
+            item = link("https://raw.githubusercontent.com/SoftPankek7/SowPackageManager/refs/heads/main/"+str(name)+".py")
+            print("Got Content.")
+            print("Trying to clear "+name+".py")
+            with open(name+".py", 'w') as file:pass
+            print("Installing "+str(name))
+            with open(name+".py", "wt") as file:
+                file.write(item)
+            print("Installed "+name+".py")
+            print(f"Linking {str(name)} to libs.el")
+            with open("libs.el", "at") as file:
+                file.write("\n"+str(name))
+            print("Finished Linking.")
+            print("Done! Restart env to see effects.")
             return True
         except ConnectionError:
             return False
@@ -63,14 +64,9 @@ class PackageManaging:
                     with open("sow.py", "wt") as file:
                         file.write(item)
                     print("Downloaded sow")
-                    print("Linking sow to libs.el")
-                    with open("sow.py", "at") as file:
-                        file.write(item)
-                    print("Finished Linking.")
                     print("Done!")
                     print("Closing Env...")
-                    import os
-                    os.system("exit")
+                    system.Output.halt("Sow has been installed and required a restart.")
                     return True
                 elif prompt.lower() == "n":
                     break
@@ -104,7 +100,9 @@ examplelib
 info
 help
 edit
+
 tedit
+sow
 ex
 
 -- IMPORTED --
@@ -122,7 +120,7 @@ class Environment:
     LibInfo = {
         "name": "sow",
         "credits": ["Charlie T"],
-        "version": 1.5,
+        "version": 1.6,
         "reqVersion": 1.6,
         "description": "The deafult package manager.",
         "helpinfo": "sow install [A]\nsow download [A]\nsow license\nsow clear\nsow update\nsow version"
@@ -140,12 +138,12 @@ class Environment:
             lib.load_libs()["help"].Environment.RunFromEnv(["sow"])
         else:
             if func[0].lower() == "install":
-                if len(func) >= 2:
+                if not len(func) == 1:
                     PackageManaging.install(func[1].lower())
                 else:
                     print("Please specify more than 1 argument for install.")
-            if func[0].lower() == "download":
-                if len(func) >= 2:
+            elif func[0].lower() == "download":
+                if not len(func) == 1:
                     print(func[1].lower())
                     PackageManaging.download(func[1].lower())
                 else:
