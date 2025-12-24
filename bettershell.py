@@ -4,10 +4,10 @@ class Environment:
     LibInfo = {
         "name": "Better Shell",
         "credits": ["Charlie T"],
-        "version": 1.0,
+        "version": 1.4,
         "reqVersion": 1.3,
         "description": "Just a cooler shell, imitating linux-like systems",
-        "helpinfo": "bettershell (gliph) - \nGliph is the character displayed in the CLI interface. Defaults to 💻."
+        "helpinfo": "bettershell (gliph) - \nGliph is the character displayed in the CLI interface. Defaults to .\nREQUIRES A NERD FONT!"
     }
 
     import libload as lib
@@ -20,8 +20,8 @@ class Environment:
         if len(func) >= 1:
             gliph = func[0]
         else:
-            gliph = "💻"
-        cli = system.Output.Format.RESET + system.Output.Format.BG_BLUE + " "+gliph+"   " + system.Output.Format.RESET + system.Output.Format.BLUE + ">" + system.Output.Format.RESET + " "
+            gliph = ""
+        cli = system.Output.Format.RESET + system.Output.Format.BLUE +""+system.Output.Format.RESET+system.Output.Format.BG_BLUE + " "+gliph+"   " + system.Output.Format.RESET + system.Output.Format.BLUE + "\n ╰┈" + system.Output.Format.RESET + " "
         while True:
             cmd = input(cli)
             if cmd.strip() != "":
