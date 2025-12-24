@@ -1,6 +1,5 @@
-> [!WARNING]
-> # SOW IS BROKEN! I WILL TRY TO FIX ASAP
-> DO **NOT** SEND PRs OR ISSUES!
+> [!NOTE]
+> Sow has been fixed on 2025/12/24 (YY/MM/DD)
 
 ## FOR SOW PACKAGE MANAGER 
 
